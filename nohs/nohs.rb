@@ -29,9 +29,7 @@ class Checkout
 	end
 
 	def evaluator
-		puts @rules
 		@rules.each do |rule|
-			puts "this is #{rule} #{rule[1][:code]}"
 			if rule[1][:code]=="total"
 				if @total >= rule[1][:quantity] 
 					@total*=rule[1][:result].to_f
