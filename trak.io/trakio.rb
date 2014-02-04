@@ -36,38 +36,36 @@ class Calculator
 		self
 	end
 
-	def input (expr)
-		uExpr=uniformize(expr)
-		puts uExpr.inspect
-	 	if uExpr[:num][0].nil? 
-	 		puts "Error on input";
-	 		return
-	 	end
-	 	@result=uExpr[:num][0].to_f
-	 	for i in 1..uExpr[:ops].count 
-	 		case uExpr[:ops][i-1]
-		 		when "+"
-		 			add(uExpr[:num][i].to_f)
-		 		when "-"
-		 			subtract(uExpr[:num][i].to_f)
-		 		when "*"
-		 			multipli_by(uExpr[:num][i].to_f)
-		 		when "/"
-		 			divide_by(uExpr[:num][i].to_f)
-		 		else
-	  				puts "I have no idea what to do with that."
-	  				return
+	def input (expr=nil)
+
+		if block_given?
+			@result= yield @result
+		else
+			uExpr=uniformize(expr)
+			if uExpr[:num][0].nil? 
+		 		puts "Error on input";
+		 		return
+		 	end
+		 	probe= uExpr[:num].count == uExpr[:ops].count ? 0 : 1 
+		 	@result= probe == 1 ? uExpr[:num][0].to_f : @result
+		 	for i in probe..uExpr[:ops].count 
+		 		case uExpr[:ops][i-1]
+			 		when "+"
+			 			add(uExpr[:num][i].to_f)
+			 		when "-"
+			 			subtract(uExpr[:num][i].to_f)
+			 		when "*"
+			 			multipli_by(uExpr[:num][i].to_f)
+			 		when "/"
+			 			divide_by(uExpr[:num][i].to_f)
+			 		else
+		  				puts "I have no idea what to do with that."
+		  				return
+				end
 			end
 		end
-
-
-		# for i to 1..uExpr.count
-		# 	case u 
-
-		# @result= eval(uExpr)
 		self
 	end
-
 
 	private
 
@@ -124,3 +122,16 @@ calc.input("6 / 5").result # 1.2
 calc.input("3 + 4 * 2").result # 14
 calc.input("3 + 4 × 2").result # 14
 calc.input("1 - 1+1").result # 1
+
+#Input can also take a block for custom operations.
+calc.result = 3
+calc.input do |x|
+  x**2
+end.result # 9
+
+#Operations can be chained
+calc = Calculator.new
+calc.input("1+1").input("- 6").result # -4
+calc.add(7).subtract(2).result # 1
+
+#The current result is held
