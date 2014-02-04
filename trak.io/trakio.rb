@@ -5,11 +5,11 @@ class Calculator
 	end
 
 	def result
-		puts !@result.nil? && @result == @result.to_i ? @result.to_i : @result 
+		puts !@result.nil? && @result.to_f == @result.to_i ? @result.to_i : @result.to_f 
 	end
 
 	def result=(num)
-		@result= num
+		@result= num.to_f
 	end
 
 	def clear_all
@@ -38,7 +38,33 @@ class Calculator
 
 	def input (expr)
 		uExpr=uniformize(expr)
-		@result= eval(uExpr)
+		puts uExpr.inspect
+	 	if uExpr[:num][0].nil? 
+	 		puts "Error on input";
+	 		return
+	 	end
+	 	@result=uExpr[:num][0].to_f
+	 	for i in 1..uExpr[:ops].count 
+	 		case uExpr[:ops][i-1]
+		 		when "+"
+		 			add(uExpr[:num][i].to_f)
+		 		when "-"
+		 			subtract(uExpr[:num][i].to_f)
+		 		when "*"
+		 			multipli_by(uExpr[:num][i].to_f)
+		 		when "/"
+		 			divide_by(uExpr[:num][i].to_f)
+		 		else
+	  				puts "I have no idea what to do with that."
+	  				return
+			end
+		end
+
+
+		# for i to 1..uExpr.count
+		# 	case u 
+
+		# @result= eval(uExpr)
 		self
 	end
 
@@ -46,9 +72,10 @@ class Calculator
 	private
 
 	def uniformize (expr)
-		expr.gsub!(/÷/,"/")
-		expr.gsub!(/[xX×]/,"*")
-		expr
+		uni={:ops, :num}
+		uni[:num] = expr.gsub(/÷/,"/").gsub(/[×xX]/,"*").gsub("**","*").gsub(" ","").split(%r{[\/\+\-\*]}).reject {|el| el.empty? }
+		uni[:ops] = expr.gsub(/÷/,"/").gsub(/[×xX]/,"*").gsub("**","*").gsub(" ","").split(%r{\d}).reject {|el| el.empty? }
+		return uni
 	end
 
 
@@ -96,4 +123,4 @@ calc.input("6 ÷ 5").result # 1.2
 calc.input("6 / 5").result # 1.2
 calc.input("3 + 4 * 2").result # 14
 calc.input("3 + 4 × 2").result # 14
-calc.input("1 - 1+1").result # 0
+calc.input("1 - 1+1").result # 1
