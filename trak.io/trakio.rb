@@ -4,12 +4,12 @@ class Calculator
 	def initialize (init=0)
 		@result= init
 		@undo=nil
-		@memory= {}
+		@memory= nil
 		@@instances << self
 	end
 
 	def self.instances
-		@@instances
+		puts @@instances
 	end
 
 	def result
@@ -87,24 +87,31 @@ class Calculator
 		self
 	end
 
-	def memory
-		puts @memory[:default].to_f == @memory[:default].to_i ? @memory[:default].to_i : @memory[:default].to_f 
+	def memory(name=:default)
+		if @memory.nil? 
+			@memory={}
+		end
+		if @memory[name.to_sym].nil? 
+				@memory[name.to_sym]=Memory.new
+		end
+		@memory[name.to_sym]		
 	end
 
 	def store_in_memory(name=:default)
-		@memory[name.to_sym] = @result
+		@memory={} if @memory.nil?
+		@memory[name.to_sym] = Memory.new(@result)
 	end
 
 	def get_memory(name=:default)
-		puts @memory[name.to_sym]
+		puts @memory.nil? || @memory[name.to_sym].nil? ? nil : @memory[name.to_sym].result 
 	end
 
-	def add_to_memory
-		@memory[]+=@result
+	def add_to_memory(name=:default)
+		@memory[name.to_sym].add(@result)
 	end
 
-	def subtract_from_memory
-		@memory-=@result
+	def subtract_from_memory(name=:default)
+		@memory[name.to_sym].subtract(@result)
 	end
 
 	def clear_memory(name=:default)
@@ -112,7 +119,7 @@ class Calculator
 	end
 	
 	def clear_all_memory
-		@memory={}
+		@memory=nil
 	end	
 
 	alias_method :plus, :add
@@ -133,6 +140,13 @@ class Calculator
 
 
 
+end
+
+class Memory < Calculator
+	def initialize (init=0)
+		@result= init
+		@undo=nil
+	end
 end
 
 calc = Calculator.new
@@ -220,6 +234,61 @@ calc.get_memory # 10
 #Perform operations on memory
 calc.memory.add(10)
 calc.memory.subtract(2)
-calc.memory.multiple_by(3)
+calc.memory.multiply_by(3)
 calc.memory.divide_by(2)
 calc.get_memory # 27
+
+calc.get_memory(:a)
+calc.memory("a").add(5)
+calc.memory("a").subtract(2)
+calc.memory("a").multiply_by(3)
+calc.memory("a").divide_by(2)
+calc.get_memory :a # 4.5
+
+#Add the current result to memory
+calc.result = 2
+calc.add_to_memory
+calc.get_memory # 29
+
+#Subtract the current result from memory
+calc.result = 2
+calc.subtract_from_memory
+calc.get_memory # 27
+
+#Allows namespace memory values distinct from the default for all of the above memory methods.
+calc.result = 3
+calc.store_in_memory
+calc.result = 4
+calc.store_in_memory :a
+calc.result = 5
+calc.store_in_memory :b
+calc.result = 5
+calc.store_in_memory :c
+calc.get_memory # 3
+calc.get_memory :a # 4
+calc.get_memory :b # 5
+calc.get_memory 'c' # 5
+
+#Can clear specific memories
+calc.clear_memory
+calc.clear_memory :a
+calc.get_memory # nil
+calc.get_memory :a # nil
+
+#Can clear all memory
+calc.clear_all_memory
+calc.get_memory :b # nil
+calc.get_memory :c # nil
+
+#Alias
+#The following methods should alias respectively
+calc.plus(4) # equivilent to calc.add(4)
+calc.minus(4) # equivilent to calc.subtract(4)
+
+#Add additional functionality in Ruby's native Float and Integer classes
+
+#The Calculator class should keep track of all instances
+
+calc1 = Calculator.new 
+calc2 = Calculator.new 
+Calculator.instances # [calc1, calc2]
