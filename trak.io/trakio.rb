@@ -52,6 +52,7 @@ class Calculator
 
 	def input (expr=nil)
 		last_ops
+		puts expr
 		if block_given?
 			@result= yield @result
 		else
@@ -130,7 +131,7 @@ class Calculator
 	def uniformize (expr)
 		uni={:ops, :num}
 		uni[:num] = expr.gsub(/÷/,"/").gsub(/[×xX]/,"*").gsub("**","*").gsub(" ","").split(%r{[\/\+\-\*]}).reject {|el| el.empty? }
-		uni[:ops] = expr.gsub(/÷/,"/").gsub(/[×xX]/,"*").gsub("**","*").gsub(" ","").split(%r{\d}).reject {|el| el.empty? }
+		uni[:ops] = expr.gsub(/÷/,"/").gsub(/[×xX]/,"*").gsub("**","*").gsub(" ","").split(%r{[\d\.]}).reject {|el| el.empty? }
 		return uni
 	end
 
@@ -146,6 +147,54 @@ class Memory < Calculator
 	def initialize (init=0)
 		@result= init
 		@undo=nil
+	end
+end
+
+class Integer
+	def add(num)
+		return Calculator.new(self).add(num).result.to_i
+	end
+
+	def subtract(num)
+		return Calculator.new(self).subtract(num).result.to_i
+	end
+
+	def multiply_by(num)
+		return Calculator.new(self).multiply_by(num).result.to_i
+	end
+
+	def divide_by(num)
+		return Calculator.new(self).divide_by(num).result.to_i
+	end
+
+	def calculate_input(expr)
+		puts self
+		puts expr
+		return Calculator.new.input(self.to_s+expr).result.to_i
+	end
+end
+
+class Float
+	def add(num)
+		return Calculator.new(self).add(num).result.to_f
+	end
+
+	def subtract(num)
+		return Calculator.new(self).subtract(num).result.to_f
+	end
+
+	def multiply_by(num)
+		return Calculator.new(self).multiply_by(num).result.to_f
+	end
+
+	def divide_by(num)
+		return Calculator.new(self).divide_by(num).result.to_f
+	end
+
+	def calculate_input(expr)
+		puts self
+		puts expr
+		return Calculator.new.input(self.to_s+expr).result.to_f
 	end
 end
 
@@ -286,9 +335,19 @@ calc.plus(4) # equivilent to calc.add(4)
 calc.minus(4) # equivilent to calc.subtract(4)
 
 #Add additional functionality in Ruby's native Float and Integer classes
+4.add(4) # 8
+12.5.divide_by(2) # 6.25
+8.subtract(2) # 6
+3.5.multiply_by(2) # 7
+3.calculate_input("+3-2.2") # 3.8
+calc.result=3
+calc.input("+3-2.2").result # 3.8
+
+#Add a calculate method to return a new Calculator instance with the result already set.
+4.calculate.add(2).result # 6
+
 
 #The Calculator class should keep track of all instances
-
 calc1 = Calculator.new 
 calc2 = Calculator.new 
 Calculator.instances # [calc1, calc2]
