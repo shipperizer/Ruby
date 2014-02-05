@@ -1,15 +1,9 @@
 class Calculator
 	
-	@@instances=[]
 	def initialize (init=0)
 		@result= init
 		@undo=nil
 		@memory= {}
-		@@instances << self
-	end
-
-	def self.instances
-		@@instances
 	end
 
 	def result
@@ -100,11 +94,11 @@ class Calculator
 	end
 
 	def add_to_memory
-		@memory[]+=@result
+		@memory[:default]+=@result
 	end
 
 	def subtract_from_memory
-		@memory-=@result
+		@memory[:default]-=@result
 	end
 
 	def clear_memory(name=:default)
@@ -113,7 +107,7 @@ class Calculator
 	
 	def clear_all_memory
 		@memory={}
-	end	
+	end
 
 	alias_method :plus, :add
 	alias_method :minus, :subtract	
