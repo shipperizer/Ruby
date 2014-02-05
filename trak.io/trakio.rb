@@ -52,7 +52,6 @@ class Calculator
 
 	def input (expr=nil)
 		last_ops
-		puts expr
 		if block_given?
 			@result= yield @result
 		else
@@ -168,9 +167,11 @@ class Integer
 	end
 
 	def calculate_input(expr)
-		puts self
-		puts expr
 		return Calculator.new.input(self.to_s+expr).result.to_i
+	end
+
+	def calculate
+		Calculator.new(self)
 	end
 end
 
@@ -192,9 +193,11 @@ class Float
 	end
 
 	def calculate_input(expr)
-		puts self
-		puts expr
 		return Calculator.new.input(self.to_s+expr).result.to_f
+	end
+
+	def calculate
+		Calculator.new(self)
 	end
 end
 
@@ -340,11 +343,9 @@ calc.minus(4) # equivilent to calc.subtract(4)
 8.subtract(2) # 6
 3.5.multiply_by(2) # 7
 3.calculate_input("+3-2.2") # 3.8
-calc.result=3
-calc.input("+3-2.2").result # 3.8
 
 #Add a calculate method to return a new Calculator instance with the result already set.
-4.calculate.add(2).result # 6
+puts 4.calculate.add(2).result # 6
 
 
 #The Calculator class should keep track of all instances
